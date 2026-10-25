@@ -48,7 +48,7 @@ class NpptcPluginTextCommand( sublime_plugin.TextCommand ):
 				result = result[key]
 		
 		if result is None:
-			raise ValueError( "Settings not defined for " + osName + "/" + osPlatform + "/" + key )
+			raise ValueError( f"Settings not defined for {osName}/{osPlatform}/{key}" )
 
 		return result
 
@@ -90,10 +90,13 @@ class NpptcRenameCommand( NpptcPluginTextCommand ):
 				"group" : group,
 				"index" : index
 			} )
-			try:
-				os.remove( oldFilePath )
-			except:
-				sublime.error_message( "Failed to delete old file (" + oldFilePath + ") - check Sublime console for error information" )
+			newFilePath = targetView.file_name()
+			renameCompleted = newFilePath is not None and newFilePath != oldFilePath and os.path.exists( newFilePath )
+			if renameCompleted:
+				try:
+					os.remove( oldFilePath )
+				except:
+					sublime.error_message( f"Failed to delete old file ({oldFilePath}) - check Sublime console for error information" )
 
 	def is_enabled( self, group = -1, index = -1 ):
 		targetView = self.getTargetView( group, index )
